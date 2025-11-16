@@ -21,6 +21,7 @@ class _AddLivreScreenState extends State<AddLivreScreen> {
   final _numeroController = TextEditingController();
   final _descriptionController = TextEditingController();
   bool _isLoadingIsbn = false;
+  String? _coverUrl;
 
   @override
   void initState() {
@@ -31,6 +32,7 @@ class _AddLivreScreenState extends State<AddLivreScreen> {
       _thematiqueController.text = widget.livre!.thematique;
       _numeroController.text = widget.livre!.numero;
       _descriptionController.text = widget.livre!.description ?? '';
+      _coverUrl = widget.livre!.coverUrl;
     }
   }
 
@@ -57,6 +59,7 @@ class _AddLivreScreenState extends State<AddLivreScreen> {
           _thematiqueController.text = bookInfo['thematique'] ?? '';
           _descriptionController.text = bookInfo['description'] ?? '';
           _numeroController.text = bookInfo['isbn'] ?? '';
+          _coverUrl = bookInfo['coverUrl'];
         });
 
         if (mounted) {
@@ -99,6 +102,7 @@ class _AddLivreScreenState extends State<AddLivreScreen> {
           description: _descriptionController.text.trim().isEmpty
               ? null
               : _descriptionController.text.trim(),
+          coverUrl: _coverUrl,
           dateAjout: widget.livre?.dateAjout,
         );
 
@@ -281,6 +285,72 @@ class _AddLivreScreenState extends State<AddLivreScreen> {
                 ),
                 maxLines: 3,
               ),
+              const SizedBox(height: 16),
+              // Aperçu de l'image de couverture
+              if (_coverUrl != null && _coverUrl!.isNotEmpty)
+                Card(
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Aperçu de la couverture',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          height: 200,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              _coverUrl!,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[200],
+                                  child: const Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.broken_image, size: 48),
+                                        SizedBox(height: 8),
+                                        Text('Impossible de charger l\'image'),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  color: Colors.grey[100],
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _saveLivre,

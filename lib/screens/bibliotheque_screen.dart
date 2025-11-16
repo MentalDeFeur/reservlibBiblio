@@ -152,13 +152,54 @@ class _BibliothequeScreenState extends State<BibliothequeScreen> {
                           vertical: 8,
                         ),
                         child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.blue,
-                            child: Text(
-                              livre.numero,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
+                          leading: livre.coverUrl != null &&
+                                  livre.coverUrl!.isNotEmpty
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    livre.coverUrl!,
+                                    width: 50,
+                                    height: 70,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return CircleAvatar(
+                                        backgroundColor: Colors.blue,
+                                        child: Text(
+                                          livre.numero,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                      );
+                                    },
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return SizedBox(
+                                        width: 50,
+                                        height: 70,
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            value: loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
+                                                : null,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                )
+                              : CircleAvatar(
+                                  backgroundColor: Colors.blue,
+                                  child: Text(
+                                    livre.numero,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
                           title: Text(
                             livre.titre,
                             style: const TextStyle(fontWeight: FontWeight.bold),

@@ -1,0 +1,16 @@
+Package: bibliotheque-app
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: libgtk-3-0, libblkid1, liblzma5, libsqlite3-0
+Maintainer: Mental Defeur <mentaldefeur@example.com>
+Description: Application de gestion de bibliothèque et réservations
+ Application Flutter pour gérer une bibliothèque de livres
+ et des réservations de créneaux horaires.
+ .
+ Fonctionnalités :
+  - Gestion de bibliothèque avec recherche par ISBN
+  - Affichage des couvertures de livres
+  - Gestion des réservations
+  - Support multiplateforme (Linux, Windows, macOS, Web)

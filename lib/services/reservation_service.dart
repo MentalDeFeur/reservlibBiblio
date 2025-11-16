@@ -1,7 +1,8 @@
 import '../models/reservation.dart';
 import 'database_helper.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'web_storage_helper.dart';
+import 'web_storage_helper_stub.dart'
+    if (dart.library.html) 'web_storage_helper_web.dart';
 
 class ReservationService {
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;

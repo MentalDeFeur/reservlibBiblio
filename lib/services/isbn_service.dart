@@ -75,11 +75,24 @@ class IsbnService {
           }
         }
 
+        // Récupérer l'URL de la couverture
+        String? coverUrl;
+        if (volumeInfo.containsKey('imageLinks')) {
+          final imageLinks = volumeInfo['imageLinks'] as Map<String, dynamic>;
+          // Essayer d'obtenir la meilleure qualité disponible
+          coverUrl = imageLinks['large'] ??
+              imageLinks['medium'] ??
+              imageLinks['small'] ??
+              imageLinks['thumbnail'] ??
+              imageLinks['smallThumbnail'];
+        }
+
         return {
           'titre': titre,
           'auteur': auteur,
           'thematique': thematique,
           'description': description,
+          'coverUrl': coverUrl,
           'isbn': isbn,
         };
       }
@@ -147,11 +160,19 @@ class IsbnService {
           description = (bookData['excerpts'] as List).first['text'];
         }
 
+        // Récupérer l'URL de la couverture
+        String? coverUrl;
+        if (bookData.containsKey('cover')) {
+          final cover = bookData['cover'] as Map<String, dynamic>;
+          coverUrl = cover['large'] ?? cover['medium'] ?? cover['small'];
+        }
+
         return {
           'titre': titre,
           'auteur': auteur,
           'thematique': thematique,
           'description': description,
+          'coverUrl': coverUrl,
           'isbn': isbn,
         };
       }

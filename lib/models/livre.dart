@@ -5,6 +5,7 @@ class Livre {
   final String thematique;
   final String numero;
   final String? description;
+  final String? coverUrl;
   final DateTime dateAjout;
 
   Livre({
@@ -14,6 +15,7 @@ class Livre {
     required this.thematique,
     required this.numero,
     this.description,
+    this.coverUrl,
     DateTime? dateAjout,
   }) : dateAjout = dateAjout ?? DateTime.now();
 
@@ -25,6 +27,7 @@ class Livre {
       'thematique': thematique,
       'numero': numero,
       'description': description,
+      'coverUrl': coverUrl,
       'dateAjout': dateAjout.toIso8601String(),
     };
   }
@@ -37,6 +40,7 @@ class Livre {
       thematique: map['thematique'] as String,
       numero: map['numero'] as String,
       description: map['description'] as String?,
+      coverUrl: map['coverUrl'] as String?,
       dateAjout: DateTime.parse(map['dateAjout'] as String),
     );
   }
@@ -48,6 +52,7 @@ class Livre {
     String? thematique,
     String? numero,
     String? description,
+    String? coverUrl,
     DateTime? dateAjout,
   }) {
     return Livre(
@@ -57,6 +62,7 @@ class Livre {
       thematique: thematique ?? this.thematique,
       numero: numero ?? this.numero,
       description: description ?? this.description,
+      coverUrl: coverUrl ?? this.coverUrl,
       dateAjout: dateAjout ?? this.dateAjout,
     );
   }

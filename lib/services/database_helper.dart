@@ -2,8 +2,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/livre.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'web_storage_helper.dart'
-    if (dart.library.io) 'web_storage_helper_stub.dart';
+import 'web_storage_helper_stub.dart'
+    if (dart.library.html) 'web_storage_helper_web.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -27,9 +27,17 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
+  }
+
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Ajouter la colonne coverUrl
+      await db.execute('ALTER TABLE livres ADD COLUMN coverUrl TEXT');
+    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -45,6 +53,7 @@ class DatabaseHelper {
         thematique $textType,
         numero $textType,
         description $textTypeNull,
+        coverUrl $textTypeNull,
         dateAjout $textType
       )
     ''');
