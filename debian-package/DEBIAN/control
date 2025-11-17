@@ -1,5 +1,5 @@
 Package: bibliotheque-app
-Version: 1.0.0
+Version: 1.0.1
 Section: utils
 Priority: optional
 Architecture: amd64
@@ -12,5 +12,5 @@ Description: Application de gestion de bibliothèque et réservations
  Fonctionnalités :
   - Gestion de bibliothèque avec recherche par ISBN
   - Affichage des couvertures de livres
-  - Gestion des réservations
+  - Gestion des réservations avec disponibilités
   - Support multiplateforme (Linux, Windows, macOS, Web)

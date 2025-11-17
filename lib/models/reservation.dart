@@ -62,6 +62,7 @@ class Reservation {
   }
 
   bool conflitsAvec(Reservation autre) {
-    return (dateDebut.isBefore(autre.dateFin) && dateFin.isAfter(autre.dateDebut));
+    return (dateDebut.isBefore(autre.dateFin) &&
+        dateFin.isAfter(autre.dateDebut));
   }
 }
