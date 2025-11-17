@@ -200,32 +200,109 @@ class _LivreDetailScreenState extends State<LivreDetailScreen> {
                     : Colors.green.shade50,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        _reservationActive != null
-                            ? Icons.block
-                            : Icons.check_circle,
-                        color: _reservationActive != null
-                            ? Colors.red.shade700
-                            : Colors.green.shade700,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          _reservationActive != null
-                              ? 'Indisponible'
-                              : 'Disponible',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                      Row(
+                        children: [
+                          Icon(
+                            _reservationActive != null
+                                ? Icons.block
+                                : Icons.check_circle,
                             color: _reservationActive != null
-                                ? Colors.red
-                                : Colors.green,
+                                ? Colors.red.shade700
+                                : Colors.green.shade700,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              _reservationActive != null
+                                  ? 'Indisponible'
+                                  : 'Disponible',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: _reservationActive != null
+                                    ? Colors.red
+                                    : Colors.green,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (_reservationActive != null) ...[
+                        const SizedBox(height: 16),
+                        const Divider(),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Icon(Icons.person,
+                                color: Colors.red.shade700, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Réservé par: ${_reservationActive!.nomReservant ?? "Non spécifié"}',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today,
+                                color: Colors.red.shade700, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Du: ${DateFormat('dd/MM/yyyy à HH:mm').format(_reservationActive!.dateDebut)}',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.event,
+                                color: Colors.red.shade700, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Au: ${DateFormat('dd/MM/yyyy à HH:mm').format(_reservationActive!.dateFin)}',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.green.shade300),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.event_available,
+                                  color: Colors.green.shade700, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Disponible à partir du: ${DateFormat('dd/MM/yyyy à HH:mm').format(_reservationActive!.dateFin)}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green.shade900,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),

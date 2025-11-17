@@ -149,7 +149,16 @@ class ReservationService {
     final reservations = await readAllReservations();
 
     for (var reservation in reservations) {
-      if (reservation.titre.toLowerCase() == titreLivre.toLowerCase() &&
+      // Vérifier si le titre de la réservation contient le titre du livre
+      // ou si la description contient le titre du livre
+      final titreMatch =
+          reservation.titre.toLowerCase().contains(titreLivre.toLowerCase());
+      final descriptionMatch = reservation.description != null &&
+          reservation.description!
+              .toLowerCase()
+              .contains('livre: ${titreLivre.toLowerCase()}');
+
+      if ((titreMatch || descriptionMatch) &&
           reservation.dateDebut.isBefore(now) &&
           reservation.dateFin.isAfter(now)) {
         return reservation;
