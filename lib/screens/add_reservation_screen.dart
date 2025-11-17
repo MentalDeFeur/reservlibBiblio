@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/reservation.dart';
+import '../models/livre.dart';
 import '../services/reservation_service.dart';
 
 class AddReservationScreen extends StatefulWidget {
   final Reservation? reservation;
+  final Livre? livrePreselectionne;
 
-  const AddReservationScreen({Key? key, this.reservation}) : super(key: key);
+  const AddReservationScreen(
+      {Key? key, this.reservation, this.livrePreselectionne})
+      : super(key: key);
 
   @override
   State<AddReservationScreen> createState() => _AddReservationScreenState();
@@ -18,7 +22,7 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
   final _nomReservantController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _categorieController = TextEditingController();
-  
+
   DateTime _dateDebut = DateTime.now();
   DateTime _dateFin = DateTime.now().add(const Duration(hours: 1));
 
@@ -32,6 +36,13 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
       _categorieController.text = widget.reservation!.categorie ?? '';
       _dateDebut = widget.reservation!.dateDebut;
       _dateFin = widget.reservation!.dateFin;
+    } else if (widget.livrePreselectionne != null) {
+      // Pré-remplir avec les informations du livre
+      _titreController.text =
+          'Réservation: ${widget.livrePreselectionne!.titre}';
+      _descriptionController.text =
+          'Livre: ${widget.livrePreselectionne!.titre}\nAuteur: ${widget.livrePreselectionne!.auteur}\nThématique: ${widget.livrePreselectionne!.thematique}';
+      _categorieController.text = 'Livre';
     }
   }
 
@@ -42,12 +53,12 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
     );
-    if (picked != null) {
+    if (picked != null && context.mounted) {
       final TimeOfDay? timePicked = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(isDebut ? _dateDebut : _dateFin),
       );
-      if (timePicked != null) {
+      if (timePicked != null && context.mounted) {
         setState(() {
           final newDateTime = DateTime(
             picked.year,
@@ -71,7 +82,8 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
 
   Future<void> _saveReservation() async {
     if (_formKey.currentState!.validate()) {
-      if (_dateFin.isBefore(_dateDebut) || _dateFin.isAtSameMomentAs(_dateDebut)) {
+      if (_dateFin.isBefore(_dateDebut) ||
+          _dateFin.isAtSameMomentAs(_dateDebut)) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('La date de fin doit être après la date de début'),
@@ -82,7 +94,7 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
       }
 
       final reservationService = ReservationService();
-      
+
       // Vérifier la disponibilité
       final disponible = await reservationService.verifierDisponibilite(
         _dateDebut,

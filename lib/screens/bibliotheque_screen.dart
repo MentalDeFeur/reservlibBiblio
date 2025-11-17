@@ -3,6 +3,7 @@ import '../models/livre.dart';
 import '../services/database_helper.dart';
 import 'add_livre_screen.dart';
 import 'livre_detail_screen.dart';
+import 'add_reservation_screen.dart';
 
 class BibliothequeScreen extends StatefulWidget {
   const BibliothequeScreen({Key? key}) : super(key: key);
@@ -211,31 +212,65 @@ class _BibliothequeScreenState extends State<BibliothequeScreen> {
                               Text('Thématique: ${livre.thematique}'),
                             ],
                           ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Confirmer la suppression'),
-                                  content: Text(
-                                      'Voulez-vous vraiment supprimer "${livre.titre}" ?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text('Annuler'),
+                          trailing: PopupMenuButton<String>(
+                            onSelected: (value) {
+                              if (value == 'reserver') {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AddReservationScreen(
+                                      livrePreselectionne: livre,
                                     ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        _supprimerLivre(livre.id!);
-                                      },
-                                      child: const Text('Supprimer'),
-                                    ),
+                                  ),
+                                );
+                              } else if (value == 'supprimer') {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title:
+                                        const Text('Confirmer la suppression'),
+                                    content: Text(
+                                        'Voulez-vous vraiment supprimer "${livre.titre}" ?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text('Annuler'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          _supprimerLivre(livre.id!);
+                                        },
+                                        child: const Text('Supprimer'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            },
+                            itemBuilder: (BuildContext context) => [
+                              const PopupMenuItem<String>(
+                                value: 'reserver',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.event_available,
+                                        color: Colors.green),
+                                    SizedBox(width: 8),
+                                    Text('Réserver'),
                                   ],
                                 ),
-                              );
-                            },
+                              ),
+                              const PopupMenuItem<String>(
+                                value: 'supprimer',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.delete, color: Colors.red),
+                                    SizedBox(width: 8),
+                                    Text('Supprimer'),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                           onTap: () async {
                             await Navigator.push(

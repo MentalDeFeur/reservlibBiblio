@@ -1,12 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/livre.dart';
+import '../models/reservation.dart';
+import '../services/reservation_service.dart';
 import 'add_livre_screen.dart';
+import 'add_reservation_screen.dart';
 
-class LivreDetailScreen extends StatelessWidget {
+class LivreDetailScreen extends StatefulWidget {
   final Livre livre;
 
   const LivreDetailScreen({Key? key, required this.livre}) : super(key: key);
+
+  @override
+  State<LivreDetailScreen> createState() => _LivreDetailScreenState();
+}
+
+class _LivreDetailScreenState extends State<LivreDetailScreen> {
+  final ReservationService _reservationService = ReservationService();
+  Reservation? _reservationActive;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _chargerReservation();
+  }
+
+  Future<void> _chargerReservation() async {
+    final reservation = await _reservationService
+        .getReservationActivePourLivre(widget.livre.titre);
+    if (mounted) {
+      setState(() {
+        _reservationActive = reservation;
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +52,7 @@ class LivreDetailScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddLivreScreen(livre: livre),
+                  builder: (context) => AddLivreScreen(livre: widget.livre),
                 ),
               );
             },
@@ -36,14 +65,15 @@ class LivreDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Afficher l'image de couverture si disponible
-            if (livre.coverUrl != null && livre.coverUrl!.isNotEmpty)
+            if (widget.livre.coverUrl != null &&
+                widget.livre.coverUrl!.isNotEmpty)
               Center(
                 child: Card(
                   elevation: 4,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
-                      livre.coverUrl!,
+                      widget.livre.coverUrl!,
                       height: 300,
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
@@ -58,7 +88,7 @@ class LivreDetailScreen extends StatelessWidget {
                       },
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
-                        return Container(
+                        return SizedBox(
                           height: 300,
                           child: Center(
                             child: CircularProgressIndicator(
@@ -74,7 +104,8 @@ class LivreDetailScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            if (livre.coverUrl != null && livre.coverUrl!.isNotEmpty)
+            if (widget.livre.coverUrl != null &&
+                widget.livre.coverUrl!.isNotEmpty)
               const SizedBox(height: 16),
             Card(
               elevation: 4,
@@ -85,12 +116,13 @@ class LivreDetailScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        if (livre.coverUrl == null || livre.coverUrl!.isEmpty)
+                        if (widget.livre.coverUrl == null ||
+                            widget.livre.coverUrl!.isEmpty)
                           CircleAvatar(
                             backgroundColor: Colors.blue,
                             radius: 30,
                             child: Text(
-                              livre.numero,
+                              widget.livre.numero,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -98,11 +130,12 @@ class LivreDetailScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                        if (livre.coverUrl == null || livre.coverUrl!.isEmpty)
+                        if (widget.livre.coverUrl == null ||
+                            widget.livre.coverUrl!.isEmpty)
                           const SizedBox(width: 16),
                         Expanded(
                           child: Text(
-                            livre.titre,
+                            widget.livre.titre,
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -112,20 +145,22 @@ class LivreDetailScreen extends StatelessWidget {
                       ],
                     ),
                     const Divider(height: 32),
-                    _buildDetailRow(Icons.person, 'Auteur', livre.auteur),
+                    _buildDetailRow(
+                        Icons.person, 'Auteur', widget.livre.auteur),
                     const SizedBox(height: 12),
                     _buildDetailRow(
-                        Icons.category, 'Thématique', livre.thematique),
+                        Icons.category, 'Thématique', widget.livre.thematique),
                     const SizedBox(height: 12),
-                    _buildDetailRow(Icons.numbers, 'Numéro', livre.numero),
+                    _buildDetailRow(
+                        Icons.numbers, 'Numéro', widget.livre.numero),
                     const SizedBox(height: 12),
                     _buildDetailRow(
                       Icons.calendar_today,
                       'Date d\'ajout',
-                      dateFormat.format(livre.dateAjout),
+                      dateFormat.format(widget.livre.dateAjout),
                     ),
-                    if (livre.description != null &&
-                        livre.description!.isNotEmpty) ...[
+                    if (widget.livre.description != null &&
+                        widget.livre.description!.isNotEmpty) ...[
                       const Divider(height: 32),
                       const Text(
                         'Description',
@@ -137,11 +172,86 @@ class LivreDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        livre.description!,
+                        widget.livre.description!,
                         style: const TextStyle(fontSize: 16),
                       ),
                     ],
                   ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Section statut de réservation
+            if (_isLoading)
+              const Card(
+                elevation: 4,
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              )
+            else
+              Card(
+                elevation: 4,
+                color: _reservationActive != null
+                    ? Colors.red.shade50
+                    : Colors.green.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _reservationActive != null
+                            ? Icons.block
+                            : Icons.check_circle,
+                        color: _reservationActive != null
+                            ? Colors.red.shade700
+                            : Colors.green.shade700,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _reservationActive != null
+                              ? 'Indisponible'
+                              : 'Disponible',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: _reservationActive != null
+                                ? Colors.red
+                                : Colors.green,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            const SizedBox(height: 16),
+            // Bouton pour créer une réservation
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddReservationScreen(
+                        livrePreselectionne: widget.livre,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.event_available),
+                label: const Text('Réserver ce livre'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  textStyle: const TextStyle(fontSize: 18),
                 ),
               ),
             ),

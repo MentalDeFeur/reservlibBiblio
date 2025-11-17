@@ -142,4 +142,19 @@ class ReservationService {
       whereArgs: [id],
     );
   }
+
+  // Vérifier si un livre est actuellement réservé
+  Future<Reservation?> getReservationActivePourLivre(String titreLivre) async {
+    final now = DateTime.now();
+    final reservations = await readAllReservations();
+
+    for (var reservation in reservations) {
+      if (reservation.titre.toLowerCase() == titreLivre.toLowerCase() &&
+          reservation.dateDebut.isBefore(now) &&
+          reservation.dateFin.isAfter(now)) {
+        return reservation;
+      }
+    }
+    return null;
+  }
 }

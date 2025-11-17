@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Permissions nécessaires pour l'application -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    
     <application
-        android:label="bibliotheque_app"
+        android:label="Bibliothèque App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

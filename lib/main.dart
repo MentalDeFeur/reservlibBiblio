@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'screens/bibliotheque_screen.dart';
 import 'screens/reservations_screen.dart';
-import 'services/sqflite_init.dart';
+import 'services/sqflite_init_mobile.dart'
+    if (dart.library.ffi) 'services/sqflite_init_desktop.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialiser sqflite pour les plateformes desktop
+  // Initialiser sqflite (la fonction appropriée sera appelée selon la plateforme)
   if (!kIsWeb) {
     await initializeSqflite();
   }

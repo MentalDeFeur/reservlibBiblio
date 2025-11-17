@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "C:/flutter_bibliotheque_app/windows"
+    "cmake.sourceDirectory": "C:/flutter_bibliotheque_app/windows",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
