@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/reservation.dart';
 import '../services/reservation_service.dart';
+import '../services/import_export_service.dart';
 import 'add_reservation_screen.dart';
 import 'reservation_detail_screen.dart';
 
@@ -14,6 +15,7 @@ class ReservationsScreen extends StatefulWidget {
 
 class _ReservationsScreenState extends State<ReservationsScreen> {
   final ReservationService _reservationService = ReservationService();
+  final ImportExportService _importExportService = ImportExportService();
   List<Reservation> _reservations = [];
   String _filtreVue = 'Toutes';
 
@@ -116,6 +118,98 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
               }).toList();
             },
             icon: const Icon(Icons.filter_list),
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) async {
+              if (value == 'export') {
+                final path = await _importExportService.exporterReservations();
+                if (mounted && path != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Exporté vers: $path')),
+                  );
+                }
+              } else if (value == 'import') {
+                final result =
+                    await _importExportService.importerReservations();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(result['message']),
+                      backgroundColor:
+                          result['success'] ? Colors.green : Colors.red,
+                    ),
+                  );
+                  if (result['success']) {
+                    _chargerReservations();
+                  }
+                }
+              } else if (value == 'export_tout') {
+                final path = await _importExportService.exporterTout();
+                if (mounted && path != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Export complet vers: $path')),
+                  );
+                }
+              } else if (value == 'import_tout') {
+                final result = await _importExportService.importerTout();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(result['message']),
+                      backgroundColor:
+                          result['success'] ? Colors.green : Colors.red,
+                    ),
+                  );
+                  if (result['success']) {
+                    _chargerReservations();
+                  }
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'export',
+                child: Row(
+                  children: [
+                    Icon(Icons.upload_file, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text('Exporter les réservations'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'import',
+                child: Row(
+                  children: [
+                    Icon(Icons.download, color: Colors.green),
+                    SizedBox(width: 8),
+                    Text('Importer des réservations'),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              const PopupMenuItem(
+                value: 'export_tout',
+                child: Row(
+                  children: [
+                    Icon(Icons.backup, color: Colors.orange),
+                    SizedBox(width: 8),
+                    Text('Exporter tout (livres + réservations)'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'import_tout',
+                child: Row(
+                  children: [
+                    Icon(Icons.restore, color: Colors.purple),
+                    SizedBox(width: 8),
+                    Text('Importer tout'),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -1,10 +1,8 @@
 [Desktop Entry]
-Version=1.0
-Type=Application
 Name=Bibliothèque App
 Comment=Gestion de bibliothèque et réservations
-Exec=/usr/bin/bibliotheque_app
-Icon=bibliotheque-app
+Exec=/usr/local/bin/bibliotheque_app
+Icon=accessories-text-editor
 Terminal=false
+Type=Application
 Categories=Office;Utility;
-Keywords=bibliothèque;livres;réservations;library;books;

@@ -8,6 +8,8 @@ Une application Flutter complète qui combine deux fonctionnalités principales 
 
 ### 🏛️ Gestion de Bibliothèque
 - ✅ **Recherche de livres par ISBN** - Récupération automatique des informations via Google Books API et Open Library
+- ✅ **Affichage des couvertures** - Images de livres récupérées automatiquement
+- ✅ **Statut de disponibilité** - Affichage si un livre est disponible ou réservé
 - ✅ Ajouter des livres avec titre, auteur, thématique, numéro et description
 - ✅ Rechercher des livres par :
   - Auteur
@@ -15,10 +17,16 @@ Une application Flutter complète qui combine deux fonctionnalités principales 
   - Titre
   - Numéro
   - Recherche globale (tous les critères)
-- ✅ Visualiser les détails d'un livre
+- ✅ Visualiser les détails d'un livre avec :
+  - Couverture du livre
+  - Informations complètes
+  - Statut de disponibilité en temps réel
+  - Date de prochaine disponibilité si réservé
+- ✅ **Réserver directement depuis la bibliothèque**
 - ✅ Modifier un livre existant
 - ✅ Supprimer un livre
-- ✅ Persistance des données (SQLite sur mobile, localStorage sur web)
+- ✅ **Import/Export des livres** au format JSON
+- ✅ Persistance des données (SQLite sur mobile/desktop, localStorage sur web)
 
 ### 📅 Gestion de Réservations
 - ✅ Créer des réservations de créneaux avec :
@@ -28,6 +36,7 @@ Une application Flutter complète qui combine deux fonctionnalités principales 
   - Nom du réservant (optionnel)
   - Catégorie (optionnel)
   - Description (optionnel)
+- ✅ **Réservation pré-remplie** depuis la page d'un livre
 - ✅ Visualiser toutes les réservations
 - ✅ Filtrer les réservations par période :
   - Toutes
@@ -37,7 +46,9 @@ Une application Flutter complète qui combine deux fonctionnalités principales 
 - ✅ Détection automatique des conflits de créneaux
 - ✅ Statut visuel (Terminée, En cours, À venir)
 - ✅ Modifier ou supprimer une réservation
-- ✅ Persistance des données (SQLite sur mobile, localStorage sur web)
+- ✅ **Import/Export des réservations** au format JSON
+- ✅ **Export complet** (livres + réservations)
+- ✅ Persistance des données (SQLite sur mobile/desktop, localStorage sur web)
 
 ## 🌐 Support Multi-plateforme
 
@@ -54,7 +65,33 @@ L'application utilise un système de stockage adaptatif :
 - **Sur web** : Les données sont stockées dans le localStorage du navigateur
 - **Sur mobile/desktop** : Les données utilisent SQLite
 
-## 🚀 Installation
+## 📥 Installation depuis le package Debian (Linux)
+
+Pour les utilisateurs Linux, un package `.deb` pré-compilé est disponible :
+
+```bash
+# Télécharger le package (version 1.0.3)
+# Disponible dans les releases GitHub
+
+# Installer le package
+sudo dpkg -i bibliotheque-app_1.0.3_amd64.deb
+
+# Lancer l'application
+/usr/local/bin/bibliotheque_app
+# Ou cherchez "Bibliothèque App" dans votre menu d'applications
+```
+
+### Dépendances système requises
+- libgtk-3-0
+- libblkid1
+- liblzma5
+- libsqlite3-0
+
+Ces dépendances sont automatiquement installées avec le package.
+
+---
+
+## 🚀 Installation depuis les sources
 
 ### Prérequis
 - Flutter SDK (>=2.19.0 <3.0.0)
@@ -100,10 +137,13 @@ L'application utilise un système de stockage adaptatif :
 ## 📦 Dépendances
 
 - **sqflite** : Base de données SQLite locale (mobile/desktop)
+- **sqflite_common_ffi** : Support FFI pour SQLite sur desktop
 - **path** : Gestion des chemins de fichiers
+- **path_provider** : Accès aux répertoires système
 - **intl** : Formatage des dates et heures
 - **provider** : Gestion d'état
 - **http** : Requêtes API pour la recherche ISBN
+- **file_picker** : Sélection de fichiers pour import/export
 
 ## 🔍 Fonctionnalité Recherche ISBN
 
@@ -120,6 +160,27 @@ Les données récupérées incluent :
 - Auteur(s)
 - Thématique/Catégories
 - Description (nettoyée des balises HTML)
+- **Image de couverture** (affichée dans la liste et les détails)
+
+## 📤 Import/Export de données
+
+L'application permet d'importer et exporter vos données au format JSON :
+
+### Export
+- **Depuis la bibliothèque** (menu ⋮) :
+  - Exporter tous les livres
+- **Depuis les réservations** (menu ⋮) :
+  - Exporter toutes les réservations
+  - **Export complet** : livres + réservations dans un seul fichier
+
+Les fichiers sont sauvegardés dans le dossier Téléchargements avec un nom horodaté.
+
+### Import
+- **Importer des livres** : Sélectionnez un fichier JSON d'export de livres
+- **Importer des réservations** : Sélectionnez un fichier JSON d'export de réservations
+- **Import complet** : Restaurez livres et réservations depuis un export complet
+
+L'import ajoute les données sans écraser l'existant.
 
 ## 🏗️ Structure du projet
 
@@ -127,18 +188,22 @@ Les données récupérées incluent :
 lib/
 ├── main.dart                           # Point d'entrée de l'application
 ├── models/                             # Modèles de données
-│   ├── livre.dart                      # Modèle Livre
+│   ├── livre.dart                      # Modèle Livre (avec coverUrl)
 │   └── reservation.dart                # Modèle Réservation
 ├── services/                           # Services
 │   ├── database_helper.dart            # Service base de données (SQLite)
-│   ├── web_storage_helper.dart         # Service stockage web (localStorage)
+│   ├── web_storage_helper_web.dart     # Service stockage web (localStorage)
+│   ├── web_storage_helper_stub.dart    # Stub pour plateformes non-web
+│   ├── sqflite_init_desktop.dart       # Initialisation SQLite FFI (desktop)
+│   ├── sqflite_init_mobile.dart        # Initialisation SQLite (mobile)
 │   ├── reservation_service.dart        # Service pour les réservations
-│   └── isbn_service.dart               # Service API ISBN
+│   ├── isbn_service.dart               # Service API ISBN
+│   └── import_export_service.dart      # Service import/export JSON
 └── screens/                            # Écrans de l'application
-    ├── bibliotheque_screen.dart        # Liste des livres
+    ├── bibliotheque_screen.dart        # Liste des livres avec import/export
     ├── add_livre_screen.dart           # Ajouter/Modifier un livre avec recherche ISBN
-    ├── livre_detail_screen.dart        # Détails d'un livre
-    ├── reservations_screen.dart        # Liste des réservations
+    ├── livre_detail_screen.dart        # Détails d'un livre avec statut disponibilité
+    ├── reservations_screen.dart        # Liste des réservations avec import/export
     ├── add_reservation_screen.dart     # Ajouter/Modifier une réservation
     └── reservation_detail_screen.dart  # Détails d'une réservation
 ```
@@ -151,20 +216,42 @@ lib/
 3. **Option 1** : Recherchez par ISBN pour remplissage automatique
    - Entrez un code ISBN dans le champ dédié
    - Cliquez sur "Rechercher"
-   - Les champs se remplissent automatiquement
+   - Les champs se remplissent automatiquement avec la couverture
 4. **Option 2** : Remplissez manuellement les informations
 5. Utilisez la barre de recherche et le filtre pour retrouver vos livres
-6. Touchez un livre pour voir ses détails complets
-7. Modifiez ou supprimez des livres selon vos besoins
+6. Touchez un livre pour voir ses détails complets :
+   - Couverture du livre
+   - Informations bibliographiques
+   - **Statut de disponibilité** (Disponible/Indisponible)
+   - Si indisponible : qui l'a réservé et jusqu'à quand
+   - Date de prochaine disponibilité
+7. Depuis la liste, utilisez le menu (⋮) sur chaque livre pour :
+   - **Réserver le livre** directement
+   - Supprimer le livre
+8. Menu général (⋮) en haut :
+   - **Exporter les livres** en JSON
+   - **Importer des livres** depuis JSON
 
 ### Réservations
 1. Basculez vers l'onglet "Réservations"
-2. Appuyez sur le bouton **+** pour créer une réservation
-3. Définissez le titre, les dates/heures de début et fin
-4. Ajoutez optionnellement un nom de réservant et une catégorie
-5. Le système détecte automatiquement les conflits de créneaux
-6. Utilisez les filtres pour afficher les réservations par période
-7. Les réservations sont colorées selon leur statut (Terminée, En cours, À venir)
+2. **Option 1** : Créer une réservation depuis un livre
+   - Allez dans la bibliothèque
+   - Ouvrez les détails d'un livre
+   - Cliquez sur "Réserver ce livre"
+   - Le formulaire est pré-rempli avec les infos du livre
+3. **Option 2** : Créer une réservation manuelle
+   - Appuyez sur le bouton **+**
+   - Remplissez les informations
+4. Définissez le titre, les dates/heures de début et fin
+5. Ajoutez optionnellement un nom de réservant et une catégorie
+6. Le système détecte automatiquement les conflits de créneaux
+7. Utilisez les filtres pour afficher les réservations par période
+8. Les réservations sont colorées selon leur statut (Terminée, En cours, À venir)
+9. Menu général (⋮) en haut :
+   - **Exporter les réservations** en JSON
+   - **Importer des réservations** depuis JSON
+   - **Exporter tout** (livres + réservations)
+   - **Importer tout**
 
 ## 🎨 Personnalisation
 
@@ -194,19 +281,35 @@ L'application utilise un thème cohérent avec :
 ### Problèmes résolus
 - ✅ **Erreur CardTheme** : Remplacé `CardTheme` par `CardThemeData` pour compatibilité
 - ✅ **Support Web SQLite** : Implémentation d'un système de stockage adaptatif (localStorage pour web)
+- ✅ **Support Desktop SQLite** : Utilisation de sqflite_common_ffi avec initialisation conditionnelle
 - ✅ **API ISBN** : Double source (Google Books + Open Library) pour meilleure fiabilité
 - ✅ **Description ISBN** : Nettoyage des balises HTML et gestion des descriptions vides
+- ✅ **Images de couverture** : Récupération et affichage automatique des couvertures de livres
+- ✅ **Migration base de données** : Ajout de la colonne coverUrl (version 2)
+- ✅ **Contexte asynchrone** : Ajout de vérifications `context.mounted` pour éviter les crashes
 - ✅ **Gestion d'erreurs** : Ajout de try-catch et messages utilisateur appropriés
 
 ### Améliorations techniques
-- Detection automatique de la plateforme (web vs mobile)
+- Detection automatique de la plateforme (web vs mobile vs desktop)
+- Compilation conditionnelle pour éviter les imports incompatibles
+- Initialisation SQLite FFI sur Linux/Windows/macOS
 - Messages de débogage pour faciliter le diagnostic
 - Confirmation visuelle des opérations réussies/échouées
 - Actualisation automatique des listes après modifications
+- Système d'import/export avec format JSON structuré
+- Vérification de disponibilité en temps réel basée sur les réservations actives
+
+### Nouvelles fonctionnalités (v1.0.3)
+- 📸 **Affichage des couvertures de livres**
+- 🔄 **Statut de disponibilité des livres** en temps réel
+- 📅 **Date de prochaine disponibilité** pour les livres réservés
+- 🔗 **Réservation directe** depuis la page d'un livre
+- 📤📥 **Import/Export complet** des données au format JSON
+- 🖥️ **Support desktop** amélioré (Linux, Windows, macOS)
 
 ## 🔄 Évolutions possibles
 
-- Export des données en CSV/PDF
+- Gestion des emprunts et retours de livres
 - Notifications pour les réservations à venir
 - Système de catégories prédéfinies
 - Statistiques et tableaux de bord
@@ -214,7 +317,9 @@ L'application utilise un thème cohérent avec :
 - Mode sombre
 - Recherche avancée avec filtres combinés
 - Scanner de code-barres pour l'ISBN
-- Import de données depuis fichiers
+- Historique des réservations par livre
+- Système de notes et commentaires sur les livres
+- Rappels automatiques avant la fin d'une réservation
 
 ## 🐛 Débogage
 

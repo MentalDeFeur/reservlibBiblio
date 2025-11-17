@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/livre.dart';
 import '../services/database_helper.dart';
+import '../services/import_export_service.dart';
 import 'add_livre_screen.dart';
 import 'livre_detail_screen.dart';
 import 'add_reservation_screen.dart';
@@ -14,6 +15,7 @@ class BibliothequeScreen extends StatefulWidget {
 
 class _BibliothequeScreenState extends State<BibliothequeScreen> {
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
+  final ImportExportService _importExportService = ImportExportService();
   List<Livre> _livres = [];
   List<Livre> _livresFiltres = [];
   String _critereRecherche = 'Tous';
@@ -86,6 +88,57 @@ class _BibliothequeScreenState extends State<BibliothequeScreen> {
       appBar: AppBar(
         title: const Text('Bibliothèque'),
         backgroundColor: Colors.blue,
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) async {
+              if (value == 'export') {
+                final path = await _importExportService.exporterLivres();
+                if (mounted && path != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Exporté vers: $path')),
+                  );
+                }
+              } else if (value == 'import') {
+                final result = await _importExportService.importerLivres();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(result['message']),
+                      backgroundColor:
+                          result['success'] ? Colors.green : Colors.red,
+                    ),
+                  );
+                  if (result['success']) {
+                    _chargerLivres();
+                  }
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'export',
+                child: Row(
+                  children: [
+                    Icon(Icons.upload_file, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text('Exporter les livres'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'import',
+                child: Row(
+                  children: [
+                    Icon(Icons.download, color: Colors.green),
+                    SizedBox(width: 8),
+                    Text('Importer des livres'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Column(
         children: [
