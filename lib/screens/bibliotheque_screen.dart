@@ -92,17 +92,18 @@ class _BibliothequeScreenState extends State<BibliothequeScreen> {
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: (value) async {
+              final messenger = ScaffoldMessenger.of(context);
               if (value == 'export') {
                 final path = await _importExportService.exporterLivres();
                 if (mounted && path != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(content: Text('Exporté vers: $path')),
                   );
                 }
               } else if (value == 'import') {
                 final result = await _importExportService.importerLivres();
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text(result['message']),
                       backgroundColor:

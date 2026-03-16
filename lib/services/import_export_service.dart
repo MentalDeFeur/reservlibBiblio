@@ -31,7 +31,6 @@ class ImportExportService {
 
       return file.path;
     } catch (e) {
-      print('Erreur lors de l\'export des livres: $e');
       return null;
     }
   }
@@ -57,7 +56,6 @@ class ImportExportService {
 
       return file.path;
     } catch (e) {
-      print('Erreur lors de l\'export des réservations: $e');
       return null;
     }
   }
@@ -87,7 +85,6 @@ class ImportExportService {
 
       return file.path;
     } catch (e) {
-      print('Erreur lors de l\'export complet: $e');
       return null;
     }
   }
@@ -122,7 +119,7 @@ class ImportExportService {
           await _dbHelper.createLivre(livre.copyWith(id: null));
           importes++;
         } catch (e) {
-          print('Erreur import livre: $e');
+          // Ignore individual import errors
         }
       }
 
@@ -132,7 +129,6 @@ class ImportExportService {
         'count': importes,
       };
     } catch (e) {
-      print('Erreur lors de l\'import des livres: $e');
       return {'success': false, 'message': 'Erreur: $e'};
     }
   }
@@ -169,7 +165,7 @@ class ImportExportService {
               .createReservation(reservation.copyWith(id: null));
           importes++;
         } catch (e) {
-          print('Erreur import réservation: $e');
+          // Ignore individual import errors
         }
       }
 
@@ -179,7 +175,6 @@ class ImportExportService {
         'count': importes,
       };
     } catch (e) {
-      print('Erreur lors de l\'import des réservations: $e');
       return {'success': false, 'message': 'Erreur: $e'};
     }
   }
@@ -218,7 +213,7 @@ class ImportExportService {
             await _dbHelper.createLivre(livre.copyWith(id: null));
             livresImportes++;
           } catch (e) {
-            print('Erreur import livre: $e');
+            // Ignore individual import errors
           }
         }
       }
@@ -232,7 +227,7 @@ class ImportExportService {
                 .createReservation(reservation.copyWith(id: null));
             reservationsImportees++;
           } catch (e) {
-            print('Erreur import réservation: $e');
+            // Ignore individual import errors
           }
         }
       }
@@ -245,7 +240,6 @@ class ImportExportService {
         'reservations': reservationsImportees,
       };
     } catch (e) {
-      print('Erreur lors de l\'import complet: $e');
       return {'success': false, 'message': 'Erreur: $e'};
     }
   }

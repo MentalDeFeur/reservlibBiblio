@@ -14,7 +14,6 @@ Future<void> initializeSqflite() async {
   } catch (e) {
     // Sur mobile, Platform.isAndroid/isIOS ne causera pas d'erreur
     // mais les imports FFI pourraient, donc on ignore
-    print('Sqflite FFI initialization skipped: $e');
   }
   // Pour Android et iOS, sqflite fonctionne nativement sans configuration
 }

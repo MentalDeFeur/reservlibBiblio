@@ -13,16 +13,17 @@ class ReservationDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
     final maintenant = DateTime.now();
-    
+
     Color statusColor;
     String statusText;
     IconData statusIcon;
-    
+
     if (reservation.dateFin.isBefore(maintenant)) {
       statusColor = Colors.grey;
       statusText = 'Terminée';
       statusIcon = Icons.check_circle;
-    } else if (reservation.dateDebut.isBefore(maintenant) && reservation.dateFin.isAfter(maintenant)) {
+    } else if (reservation.dateDebut.isBefore(maintenant) &&
+        reservation.dateFin.isAfter(maintenant)) {
       statusColor = Colors.green;
       statusText = 'En cours';
       statusIcon = Icons.play_circle;
@@ -54,7 +55,8 @@ class ReservationDetailScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddReservationScreen(reservation: reservation),
+                  builder: (context) =>
+                      AddReservationScreen(reservation: reservation),
                 ),
               );
             },
@@ -95,7 +97,7 @@ class ReservationDetailScreen extends StatelessWidget {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: statusColor.withOpacity(0.2),
+                                  color: statusColor.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: Text(
@@ -179,7 +181,8 @@ class ReservationDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value, Color color) {
+  Widget _buildDetailRow(
+      IconData icon, String label, String value, Color color) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

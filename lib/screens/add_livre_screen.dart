@@ -106,14 +106,10 @@ class _AddLivreScreenState extends State<AddLivreScreen> {
           dateAjout: widget.livre?.dateAjout,
         );
 
-        print('Tentative de sauvegarde du livre: ${livre.titre}');
-
         if (widget.livre == null) {
-          final savedLivre = await DatabaseHelper.instance.createLivre(livre);
-          print('Livre créé avec ID: ${savedLivre.id}');
+          await DatabaseHelper.instance.createLivre(livre);
         } else {
           await DatabaseHelper.instance.updateLivre(livre);
-          print('Livre mis à jour avec ID: ${livre.id}');
         }
 
         if (mounted) {
@@ -128,7 +124,6 @@ class _AddLivreScreenState extends State<AddLivreScreen> {
           );
         }
       } catch (e) {
-        print('Erreur lors de la sauvegarde du livre: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

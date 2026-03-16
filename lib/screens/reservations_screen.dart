@@ -122,10 +122,11 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: (value) async {
+              final messenger = ScaffoldMessenger.of(context);
               if (value == 'export') {
                 final path = await _importExportService.exporterReservations();
                 if (mounted && path != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(content: Text('Exporté vers: $path')),
                   );
                 }
@@ -133,7 +134,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
                 final result =
                     await _importExportService.importerReservations();
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text(result['message']),
                       backgroundColor:
@@ -147,14 +148,14 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
               } else if (value == 'export_tout') {
                 final path = await _importExportService.exporterTout();
                 if (mounted && path != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(content: Text('Export complet vers: $path')),
                   );
                 }
               } else if (value == 'import_tout') {
                 final result = await _importExportService.importerTout();
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text(result['message']),
                       backgroundColor:
@@ -284,7 +285,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.2),
+                            color: color.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(

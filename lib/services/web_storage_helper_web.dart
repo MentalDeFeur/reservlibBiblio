@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 import '../models/livre.dart';
 
 class WebStorageHelper {
@@ -8,7 +8,7 @@ class WebStorageHelper {
 
   // Livres
   static Future<List<Livre>> getAllLivres() async {
-    final jsonString = html.window.localStorage[_livresKey];
+    final jsonString = web.window.localStorage[_livresKey];
     if (jsonString == null || jsonString.isEmpty) {
       return [];
     }
@@ -86,12 +86,12 @@ class WebStorageHelper {
   static Future<void> _saveLivres(List<Livre> livres) async {
     final jsonList = livres.map((l) => l.toMap()).toList();
     final jsonString = json.encode(jsonList);
-    html.window.localStorage[_livresKey] = jsonString;
+    web.window.localStorage[_livresKey] = jsonString;
   }
 
   // Réservations
   static Future<List<Map<String, dynamic>>> getAllReservations() async {
-    final jsonString = html.window.localStorage[_reservationsKey];
+    final jsonString = web.window.localStorage[_reservationsKey];
     if (jsonString == null || jsonString.isEmpty) {
       return [];
     }
@@ -144,6 +144,6 @@ class WebStorageHelper {
   static Future<void> _saveReservations(
       List<Map<String, dynamic>> reservations) async {
     final jsonString = json.encode(reservations);
-    html.window.localStorage[_reservationsKey] = jsonString;
+    web.window.localStorage[_reservationsKey] = jsonString;
   }
 }

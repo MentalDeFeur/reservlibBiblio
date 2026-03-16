@@ -78,12 +78,9 @@ class DatabaseHelper {
     }
     try {
       final db = await instance.database;
-      print('Base de données obtenue, insertion du livre...');
       final id = await db.insert('livres', livre.toMap());
-      print('Livre inséré avec ID: $id');
       return livre.copyWith(id: id);
     } catch (e) {
-      print('Erreur dans createLivre: $e');
       rethrow;
     }
   }

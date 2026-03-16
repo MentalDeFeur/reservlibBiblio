@@ -17,7 +17,6 @@ class IsbnService {
       final openLibraryResult = await _fetchFromOpenLibrary(cleanIsbn);
       return openLibraryResult;
     } catch (e) {
-      print('Erreur lors de la récupération du livre: $e');
       return null;
     }
   }
@@ -99,7 +98,6 @@ class IsbnService {
 
       return null;
     } catch (e) {
-      print('Erreur Google Books: $e');
       return null;
     }
   }
@@ -179,7 +177,6 @@ class IsbnService {
 
       return null;
     } catch (e) {
-      print('Erreur Open Library: $e');
       return null;
     }
   }
