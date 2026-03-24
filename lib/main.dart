@@ -1,9 +1,51 @@
+import 'package:bibliotheque_app/screens/add_livre_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'screens/bibliotheque_screen.dart';
 import 'screens/reservations_screen.dart';
 import 'services/sqflite_init_mobile.dart'
     if (dart.library.ffi) 'services/sqflite_init_desktop.dart';
+
+class QrScanner extends StatelessWidget {
+  const QrScanner({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Scanner QR Code'),
+      ),
+      body: MobileScanner(
+        onDetect: (capture) {
+          final List<Barcode> barcodes = capture.barcodes;
+          for (final barcode in barcodes) {
+            debugPrint('Barcode found! ${barcode.rawValue}');
+
+            Navigator.pop(context,
+                barcode.rawValue); // Retourne la valeur du QR code scanné
+
+            if (barcode.rawValue != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('QR Code scanné: ${barcode.rawValue}')),
+              );
+              final livre = Livre(
+                id: int.parse(barcode.rawValue!),
+                titre: 'Titre du livre',
+                auteur: 'Auteur du livre',
+                disponible: true,
+              );
+              final addLivreScreen = AddLivreScreen(, livre);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => addLivreScreen),
+              );
+            }
+          }
+        },
+      ),
+    );
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _pages = [
     const BibliothequeScreen(),
     const ReservationsScreen(),
+    const QrScanner(),
   ];
 
   void _onItemTapped(int index) {
@@ -74,9 +117,17 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.calendar_today),
             label: 'Réservations',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.qr_code),
+            label: 'QR Code',
+          ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: _selectedIndex == 0 ? Colors.blue : Colors.green,
+        selectedItemColor: _selectedIndex == 0
+            ? Colors.blue
+            : _selectedIndex == 1
+                ? Colors.green
+                : Colors.yellow,
         onTap: _onItemTapped,
       ),
     );
