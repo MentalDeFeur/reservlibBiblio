@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../models/livre.dart';
 import '../models/reservation.dart';
 import '../services/reservation_service.dart';
@@ -37,6 +38,39 @@ class _LivreDetailScreenState extends State<LivreDetailScreen> {
     }
   }
 
+  void _showQrCode(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          widget.livre.titre,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            QrImageView(
+              data: widget.livre.numero,
+              version: QrVersions.auto,
+              size: 220,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Numéro : ${widget.livre.numero}',
+              style: const TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy');
@@ -46,6 +80,11 @@ class _LivreDetailScreenState extends State<LivreDetailScreen> {
         title: const Text('Détails du livre'),
         backgroundColor: Colors.blue,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code),
+            tooltip: 'Afficher le QR Code',
+            onPressed: () => _showQrCode(context),
+          ),
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {

@@ -99,6 +99,7 @@ class DatabaseHelper {
         'thematique',
         'numero',
         'description',
+        'coverUrl',
         'dateAjout'
       ],
       where: 'id = ?',

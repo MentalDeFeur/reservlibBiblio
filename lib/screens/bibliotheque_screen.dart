@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../models/livre.dart';
 import '../services/database_helper.dart';
 import '../services/import_export_service.dart';
@@ -70,6 +71,39 @@ class _BibliothequeScreenState extends State<BibliothequeScreen> {
     setState(() {
       _livresFiltres = resultats;
     });
+  }
+
+  void _showQrCode(BuildContext context, Livre livre) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          livre.titre,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            QrImageView(
+              data: livre.numero,
+              version: QrVersions.auto,
+              size: 220,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Numéro : ${livre.numero}',
+              style: const TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _supprimerLivre(int id) async {
@@ -268,7 +302,9 @@ class _BibliothequeScreenState extends State<BibliothequeScreen> {
                           ),
                           trailing: PopupMenuButton<String>(
                             onSelected: (value) {
-                              if (value == 'reserver') {
+                              if (value == 'qrcode') {
+                                _showQrCode(context, livre);
+                              } else if (value == 'reserver') {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -303,6 +339,16 @@ class _BibliothequeScreenState extends State<BibliothequeScreen> {
                               }
                             },
                             itemBuilder: (BuildContext context) => [
+                              const PopupMenuItem<String>(
+                                value: 'qrcode',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.qr_code, color: Colors.indigo),
+                                    SizedBox(width: 8),
+                                    Text('QR Code'),
+                                  ],
+                                ),
+                              ),
                               const PopupMenuItem<String>(
                                 value: 'reserver',
                                 child: Row(
